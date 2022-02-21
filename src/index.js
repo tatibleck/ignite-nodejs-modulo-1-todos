@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
@@ -11,11 +11,12 @@ const users = [];
 
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers;
+
   const userAlreadyExists = users.find(user => user.username === username);
   if (!userAlreadyExists) {
-    return response.status(404).json({ error: "Username not found" });
+    return response.status(404).json({ error: 'Username not found' });
   }
-  request.user = user;
+  request.user = userAlreadyExists;
   return next();
 }
 
@@ -58,7 +59,7 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 
   user.todos.push(todosOperation);
 
-  return response.status(201).json(todo);
+  return response.status(201).json(todosOperation);
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -68,7 +69,7 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 
   const todoExist = user.todos.find(todo => todo.id === id);
   if (!todoExist) {
-    return response.status(404).json({ error: "Todo not found!" });
+    return response.status(404).json({ error: 'Todo not found' });
   }
 
   todoExist.title = title;
@@ -83,7 +84,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 
   const todoExist = user.todos.find(todo => todo.id === id);
   if (!todoExist) {
-    return response.status(404).json({ error: "Todo not found!" });
+    return response.status(404).json({ error: 'Todo not found!' });
   }
 
   todoExist.done = true;
@@ -96,13 +97,13 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { user } = request;
 
   const todoExist = user.todos.findIndex(todo => todo.id === id);
-  if (!todoExist === -1) {
-    return response.status(404).json({ error: "Todo not found!" });
+  if (todoExist === -1) {
+    return response.status(404).json({ error: 'Todo not found!' });
   }
 
   user.todos.splice(todoExist, 1);
 
-  return response.status(204).send();
+  return response.status(204).json();
 });
 
 module.exports = app;
